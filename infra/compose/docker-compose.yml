@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  honeyd:
+    build:
+      context: ../docker
+      dockerfile: Dockerfile
+
+    container_name: honeyd
+
+    # Honeyd needs low-level network access.
+    network_mode: host
+    privileged: true
+
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+    environment:
+      # For this PLC demo, Honeyd listens on loopback.
+      # Change this only if you redesign the scenario to use a real NIC.
+      HONEYD_INTERFACE: lo
+
+      # Path INSIDE the container to the mounted Honeyd config file.
+      HONEYD_CONFIG: /opt/honeyd/honeyd.conf
+
+      # Route used so traffic to the fake PLC subnet is sent to loopback.
+      HONEYD_NET: 192.168.0.0
+      HONEYD_MASK: 255.255.255.0
+      HONEYD_GW: 127.0.0.1
+
+      # Path INSIDE the container to the Honeyd binary mounted from the host.
+      HONEYD_BIN: /usr/local/bin/honeyd-host
+
+    volumes:
+      # Host Honeyd binary from the preconfigured machine.
+      # Update this path if Honeyd lives somewhere else on another system.
+      - /home/efren/honeyd/Honeyd/honeyd:/usr/local/bin/honeyd-host:ro
+
+      # Host Honeyd config file from the preconfigured machine.
+      # This is the actual PLC scenario file used by Honeyd.
+      - /home/efren/honeyd/Honeyd/honeyplc:/opt/honeyd/honeyd.conf:ro
+      # Data files needed
+      - /home/efren/honeyd/Honeyd:/usr/share/honeyd:ro
+
+      # Optional scripts directory from the repo for future use.
+      - ../scripts:/opt/honeyd/scripts:ro
+
+    restart: unless-stopped
