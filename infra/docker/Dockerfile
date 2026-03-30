@@ -22,25 +22,12 @@ RUN apt-get update && apt-get install -y \
     libevent-dev \
     libpcap-dev \
     libpcre3-dev \
-    libedit \
+    libedit-dev \
     libdumbnet-dev \
     zlib1g \
     zlib1g-dev \
+    python \
     && rm -rf /var/lib/apt/lists/*
-WORKDIR /opt
-
-RUN git clone https://github.com/DataSoft/Honeyd.git && \
-    git clone https://github.com/sefcom/honeyplc.git
-
-WORKDIR /opt/Honeyd
-RUN ./autogen.sh && \
-    ./configure && \
-    make -j"$(nproc)" && \
-    make install
-
-RUN if [ -f /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
-        cp /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 /usr/lib/libsnap7.so; \
-    fi
 
 WORKDIR /opt
 
@@ -56,14 +43,14 @@ RUN ./autogen.sh && \
     make install
 
 # Optional Snap7 shared library placement used in your history
-RUN if [ -f /opt/honeyplc/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
-        cp /opt/honeyplc/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 /usr/lib/libsnap7.so; \
+RUN if [ -f /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
+        cp /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 /usr/lib/libsnap7.so; \
     fi
 
 WORKDIR /opt/honeyd
 
-COPY entrypoint.sh /opt/honeyd/entrypoint.sh
-COPY honeyd.conf /opt/honeyd/honeyd.conf
+COPY infra/docker/entrypoint.sh /opt/honeyd/entrypoint.sh
+COPY infra/docker/honeyd.conf /opt/honeyd/honeyd.conf
 
 RUN chmod +x /opt/honeyd/entrypoint.sh
 
