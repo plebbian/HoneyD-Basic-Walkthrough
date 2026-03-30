@@ -1,138 +1,75 @@
 # Honeyd PLC Honeypot Getting Started Guide
 
-## Preview
+## Overview
 
-This setup creates a simulated industrial control system environment using:
+This setup creates a simulated network environment using:
 
-* Honeyd (network honeypot)
-* Snap7 PLC server (real backend logic)
-* Docker (deployment container)
-* PLCinject (test client)
+- Honeyd (network honeypot)
+- Docker (containerized runtime)
 
 ---
 
 ## Architecture
 
-```
-PLCinject (exploit tool) --> Honeyd (fake device) --> Snap7 Server (host responds)
-```
-
-* Fake PLC IP: `192.168.0.125`
-* Protocol: Siemens S7 (port 102)
+- Fake PLC IP: `192.168.0.125`
+- Protocol: Siemens S7 (port 102)
 
 ---
 
 ## Prerequisites
 
-* Ubuntu 18.04 VM (honeyd already preconfigured)
-* Docker + Docker Compose installed
-* Preconfigured Honeyd source directory:
+- Linux host
+- Docker installed
+- Repository cloned:
 
-  ```
-  /home/.../honeyd/Honeyd
-  ```
-* PLC server project:
-
-  ```
-  ~/honeyplc/
-  ```
-
----
-
-## Step 1: Fix System Time (if using VM)
-
+- Script available:
 ```bash
-sudo timedatectl set-ntp true
-sudo systemctl restart systemd-timesyncd
-timedatectl status
+./scripts/START.sh
+./scripts/RESET.sh
+./scripts/logs.sh
+./scripts/exec.sh
 ```
 
 ---
 
-## Step 2: Build Docker Container
+## Step 1: Start Honeyd
+
+From the repository root:
 
 ```bash
-cd ~/.../HoneyD-Basic-Walkthrough
-docker compose -f infra/compose/docker-compose.yml build --no-cache
+./scripts/start.sh
 ```
+- Builds image, removes any existing containers, starts the honeypot
 
----
-
-## Step 3: Start PLC Backend (TERMINAL 1)
-
-```bash
-cd ~/honeyplc/honeyplc/snap7/examples/cpp/x86_64-linux
-sudo ./server 127.0.0.1
-```
-
-Expected:
-
-```
-Server started
-```
-
----
-
-## Step 4: Start Honeyd (TERMINAL 2)
-
-```bash
-cd ~/.../HoneyD-Basic-Walkthrough
-docker compose -f infra/compose/docker-compose.yml up
-```
-
-Expected:
-
-```
-Honeyd started
-listening on lo
-```
-
----
-
-## Step 5: Test the System (TERMINAL 3)
-
-```bash
-cd ~/PLCinject
-./plcinject -c 192.168.0.125 -d
-```
-
-Type:
-
-```
-y
-```
+## Step 2: Verify Honeyd is Running
 
 Expected output:
 
+```bash
+[*] USING HONEYD BINARY: /usr/bin/honeyd
+[*] STARTING HONEYD...
+listening on lo
 ```
-DB21
-DB103
-DB3
-```
 
----
+## Step 3: Stop Honeyd
 
-## Step 6: Stop Services
+To stop the honeypot:
 
-Stop Honeyd:
-
-```
+```bash
 CTRL + C
 ```
 
-Stop PLC server:
+Or manually:
 
+```bash
+docker rm -f honeyd
 ```
-CTRL + C
-```
 
----
+## Extra info
 
-## Notes
+The logs and exec scripts are for seeing what Honeyd is doing (observing) and going into the container (interacting).
 
-* Honeyd runs inside Docker but uses host binary
-* PLC server runs directly on host
-* Loopback (`lo`) is used for communication
-* Route is added automatically inside container
+Needed if:
 
----
+- Something breaks
+- Adding more files in
