@@ -35,13 +35,13 @@ services:
     volumes:
       # Host Honeyd binary from the preconfigured machine.
       # Update this path if Honeyd lives somewhere else on another system.
-      - /home/efren/honeyd/Honeyd/honeyd:/usr/local/bin/honeyd-host:ro
+      - /home/tchatto/honeyd/Honeyd/honeyd:/usr/local/bin/honeyd-host:ro
 
       # Host Honeyd config file from the preconfigured machine.
       # This is the actual PLC scenario file used by Honeyd.
-      - /home/efren/honeyd/Honeyd/honeyplc:/opt/honeyd/honeyd.conf:ro
+      - /home/tchatto/honeyd/Honeyd/honeyplc:/opt/honeyd/honeyd.conf:ro
       # Data files needed
-      - /home/efren/honeyd/Honeyd:/usr/share/honeyd:ro
+      - /home/tchatto/honeyd/Honeyd:/usr/share/honeyd:ro
 
       # Optional scripts directory from the repo for future use.
       - ../scripts:/opt/honeyd/scripts:ro
