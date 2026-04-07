@@ -4,25 +4,33 @@
 
 This setup creates a simulated network environment using:
 
-- Honeyd (network honeypot)
-- Docker (containerized runtime)
+* Honeyd (network honeypot)
+* Docker (containerized runtime)
+* Docker Compose (orchestration)
 
 ---
 
 ## Architecture
 
-- Fake PLC IP: `192.168.0.125`
-- Protocol: Siemens S7 (port 102)
+* Fake PLC IP: `192.168.0.125`
+* Protocol: Siemens S7 (port 102)
 
 ---
 
 ## Prerequisites
 
-- Linux host
-- Docker installed
-- Repository cloned:
+* **Linux host (recommended for full functionality)**
+* Windows/MacOS will work but with simulated network (no real traffic)
+* Docker installed
+* Docker Compose installed
+* Repository cloned
 
-- Script available:
+---
+
+## Project Scripts
+
+Optional helper scripts:
+
 ```bash
 ./scripts/START.sh
 ./scripts/RESET.sh
@@ -30,16 +38,27 @@ This setup creates a simulated network environment using:
 ./scripts/exec.sh
 ```
 
+These are convenience wrappers around Docker Compose.
+
 ---
 
 ## Step 1: Start Honeyd
 
-From the repository root:
+From the repository root, Linux:
 
 ```bash
-./scripts/start.sh
+docker compose --profile linux up --build
 ```
-- Builds image, removes any existing containers, starts the honeypot
+For Windows/MacOS:
+
+```bash
+docker compose --profile compat up --build
+```
+* Builds the Docker image
+* Starts the Honeyd container
+* Attaches to logs
+
+---
 
 ## Step 2: Verify Honeyd is Running
 
@@ -48,28 +67,110 @@ Expected output:
 ```bash
 [*] USING HONEYD BINARY: /usr/bin/honeyd
 [*] STARTING HONEYD...
-listening on lo
+honeyd[1]: listening on lo: ip
 ```
 
-## Step 3: Stop Honeyd
+---
 
-To stop the honeypot:
+## Step 3: Detach (Optional)
+
+To leave the container running in the background:
+
+```text
+Press: d
+```
+
+---
+
+## Step 4: Stop Honeyd
+
+If running in the foreground:
 
 ```bash
 CTRL + C
 ```
 
-Or manually:
+If running in the background:
 
 ```bash
-docker rm -f honeyd
+docker compose down
 ```
 
-## Extra info
+---
 
-The logs and exec scripts are for seeing what Honeyd is doing (observing) and going into the container (interacting).
+## Logs and Debugging
 
-Needed if:
+View logs:
 
-- Something breaks
-- Adding more files in
+```bash
+docker compose logs -f
+```
+
+Or:
+
+```bash
+./scripts/logs.sh
+```
+
+---
+
+## Access the Container
+
+To enter the running container:
+
+```bash
+docker compose exec honeyd bash
+```
+
+Or:
+
+```bash
+./scripts/exec.sh
+```
+
+---
+
+## Notes
+
+* This setup uses **host networking**, which requires Linux for full functionality.
+* Windows and macOS may run the container, but network emulation may be limited.
+* The container runs Honeyd with a predefined configuration located at:
+
+```text
+/opt/honeyd/honeyd.conf
+```
+
+---
+
+## Troubleshooting
+
+If something breaks:
+
+1. Check logs:
+
+   ```bash
+   docker compose logs -f
+   ```
+
+2. Restart clean:
+
+   ```bash
+   docker compose down
+   docker compose up --build
+   ```
+
+3. Ensure no conflicting containers:
+
+   ```bash
+   docker rm -f honeyd
+   ```
+
+---
+
+## Summary
+
+* Start: `docker compose up --build`
+* Detach: press `d`
+* Stop: `CTRL + C` or `docker compose down`
+* Logs: `docker compose logs -f`
+* Exec: `docker compose exec honeyd bash`

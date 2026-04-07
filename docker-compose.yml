@@ -1,11 +1,11 @@
 services:
   honeyd:
+    profiles: ["linux"]
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
 
-    container_name: honeyd
-
+    container_name: honeyd-linux
     network_mode: host
     privileged: true
 
@@ -15,6 +15,35 @@ services:
 
     environment:
       HONEYD_INTERFACE: lo
+      HONEYD_CONFIG: /opt/honeyd/honeyd.conf
+      HONEYD_NET: 192.168.0.0/24
+      HONEYD_GW: 127.0.0.1
+      HONEYD_BIN: /usr/bin/honeyd
+
+    volumes:
+      - ./infra/config/honeyd.conf:/opt/honeyd/honeyd.conf:ro
+      - ./scripts:/opt/honeyd/scripts:ro
+
+    restart: unless-stopped
+
+  honeyd-compat:
+    profiles: ["compat"]
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+
+    container_name: honeyd-compat
+    privileged: true
+
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+    ports:
+      - "102:102"
+
+    environment:
+      HONEYD_INTERFACE: eth0
       HONEYD_CONFIG: /opt/honeyd/honeyd.conf
       HONEYD_NET: 192.168.0.0/24
       HONEYD_GW: 127.0.0.1
