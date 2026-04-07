@@ -28,12 +28,15 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     python \
     && rm -rf /var/lib/apt/lists/*
+    
 
 WORKDIR /opt
 
 # Clone the same projects from your VM history
 RUN git clone https://github.com/DataSoft/Honeyd.git && \
     git clone https://github.com/sefcom/honeyplc.git
+
+RUN find /opt/Honeyd -name xprobe2.conf || true
 
 # Build and install Honeyd
 WORKDIR /opt/Honeyd
@@ -42,7 +45,6 @@ RUN ./autogen.sh && \
     make -j"$(nproc)" && \
     make install
 
-# Optional Snap7 shared library placement used in your history
 RUN if [ -f /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
         cp /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 /usr/lib/libsnap7.so; \
     fi
@@ -50,7 +52,7 @@ RUN if [ -f /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
 WORKDIR /opt/honeyd
 
 COPY infra/docker/entrypoint.sh /opt/honeyd/entrypoint.sh
-COPY infra/docker/honeyd.conf /opt/honeyd/honeyd.conf
+COPY infra/config/honeyd.conf /opt/honeyd/honeyd.conf
 
 RUN chmod +x /opt/honeyd/entrypoint.sh
 

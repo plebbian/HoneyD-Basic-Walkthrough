@@ -1,0 +1,27 @@
+services:
+  honeyd:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+
+    container_name: honeyd
+
+    network_mode: host
+    privileged: true
+
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+    environment:
+      HONEYD_INTERFACE: lo
+      HONEYD_CONFIG: /opt/honeyd/honeyd.conf
+      HONEYD_NET: 192.168.0.0/24
+      HONEYD_GW: 127.0.0.1
+      HONEYD_BIN: /usr/bin/honeyd
+
+    volumes:
+      - ./infra/config/honeyd.conf:/opt/honeyd/honeyd.conf:ro
+      - ./scripts:/opt/honeyd/scripts:ro
+
+    restart: unless-stopped
