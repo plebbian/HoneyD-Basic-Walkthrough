@@ -20,6 +20,7 @@ This will return a list of open ports.
 Look at the output and identify:
 * Which ports are open
 * What services they appear to be (HTTP, SSH, etc.)
+
 Example:
 * Port 80 -> HTTP (web server)
 * Port 22 -> SSH
@@ -35,7 +36,28 @@ If port 22 (SSH) is open:
 - Try connecting using SSH:
 <pre> ssh user@192.128.0.1 </pre>
 
+If other ports are open:
+- You can use tools like:
+<pre> nc 192.128.0.1 (port_number) </pre>
+
 #### Step 4: Observe Results
+Pay attention to:
+* What kind of responses you receive
+* Whether the service behaves like a real system
+* Any unusual or limited behavior
+
+#### Step 5: Document your Findings
+Write down:
+- Open ports discovered
+- Tools/commands used
+- Responses from each service
+- Anything that seemed “fake” or unusual
+
 
 ### 3. Solution:
-Use curl to interact with openport 80 honeypot
+Example Solutions:
+- Using Curl on Open Port 80:
+<pre> 
+nmap 192.128.0.1
+curl http://192.128.0.1
+</pre>
