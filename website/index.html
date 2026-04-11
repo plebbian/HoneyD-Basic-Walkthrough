@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF=8">
+	<title>HoneyD Dashboard</title>
+	<link rel="stylesheet" href="/">
+<style>
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #8C0B42;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.panel {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0,.1);
+}
+
+pre {
+    background: #111;
+    color: #0f0;
+    padding: 10px;
+    height: 250px;
+    overflow-y: scroll;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    cursor: pointer;
+    border: none;
+    background: #009DB8;
+    color: white;
+    border-radius: 5px;
+}
+button:hover {
+    background-color: #6CC3BC;
+}
+
+.tab {
+  overflow: hidden;
+  background-color: #009DB8;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.tab button:hover {
+  background-color: #6CC3BC;
+}
+
+.tab button.active {
+  background-color: #009DB8;
+}
+
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+</style>
+</head>
+<body>
+	<header>
+		<h1><img class="logo" img src="images/NM_State_University_logo.png" alt="New Mexico State University Logo" width="90" height="90" title="Made with ♥ @ NMSU" /> HoneyD Monitoring Dashboard</h1>
+	</header>
+
+	<main>
+		<section class="panel">
+			<h2>Live Logs</h2>
+			<pre id="logbox">Loading logs...</pre>
+		</section>
+	
+		<section class="panel">
+			<h2>Challenges</h2>
+			<div id="challengeList">Loading challenges...</div>
+		</section>
+
+		<section class="panel">
+			<h2>Tools</h2>
+			<button onclick="downloadPCAP()">Download Latest PCAP</button>
+			<button onclick="runAnalysis">Run Analysis</button>
+			<pre id="analysisOutput"></pre>
+		</section>
+
+        <section class="panel">
+            <h2>About</h2>
+            <p>Click on the tabs below to learn more:</p>
+
+            <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'AboutProject')">About Project</button>
+            <button class="tablinks" onclick="openTab(event, 'Documentation')">Documentation</button>
+            <button class="tablinks" onclick="openTab(event, 'GitHub')">GitHub</button>
+            </div>
+
+            <div id="AboutProject" class="tabcontent">
+            <h3>About Project</h3>
+                <p>In this project, we built a containerized "honeypot Lab", a reproducable Docker based environment that runs "HoneyD", a low interaction honeypot.</p>
+                <a href="about.html">Learn More</a>
+            </div>
+
+            <div id="Documentation" class="tabcontent">
+            <h3>Documentation</h3>
+                <p>Want to read about the documentation behind the project? Read about the curriculm?</p>
+                <a href="docs.html">Learn More</a>
+            </div>
+
+        <div id="GitHub" class="tabcontent">
+            <h3>GitHub</h3>
+            <p>HoneyD-Basic-Walkthrough</p>
+            <a href="https://github.com/plebbian/HoneyD-Basic-Walkthrough" target="_blank">Visit GitHub</a>
+        </div>
+
+        </section>
+	</main>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+            
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+            
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+    //WIP will do the rest first
+
+    // Auto-refresh logs every 3 seconds
+    async function loadLogs() {
+        try {
+            const res = await fetch("/logs");
+            const data = await res.json();
+            document.getElementById("logBox").textContent = data.join("");
+        } catch (err) {
+            document.getElementById("logBox").textContent = "Error loading logs.";
+        }
+    }
+    setInterval(loadLogs, 3000);
+    loadLogs();
+
+    // Load challenges
+    async function loadChallenges() {
+        try {
+            const res = await fetch("/challenges");
+            const challenges = await res.json();
+            const container = document.getElementById("challengeList");
+            container.innerHTML = "";
+
+        challenges.forEach(ch => {
+            const div = document.createElement("div");
+            div.className = "challenge";
+
+            div.innerHTML = `
+            <h3>${ch.title}</h3>
+            <p>${ch.description}</p>
+            <button onclick="alert('${ch.hint}')">Hint</button>
+            `;
+
+        container.appendChild(div);
+        });
+
+        } catch (err) {
+            document.getElementById("challengeList").textContent = "Error loading challenges.";
+        }
+    }
+    loadChallenges();
+
+    // Download PCAP
+    function downloadPCAP() {
+        window.location.href = "/pcap";
+    }
+
+    // Run analysis script
+    async function runAnalysis() {
+        const output = document.getElementById("analysisOutput");
+        output.textContent = "Running analysis...";
+
+        try {
+            const res = await fetch("/analysis");
+            const data = await res.json();
+            output.textContent = data.analysis;
+        } catch (err) {
+            output.textContent = "Error running analysis.";
+        }
+    }
+
+</script>
+</body>
+</html>
