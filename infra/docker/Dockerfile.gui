@@ -1,0 +1,15 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    docker.io
+
+RUN pip3 install --upgrade pip==20.3.4
+RUN pip3 install Flask==1.1.2 docker==4.4.4
+
+WORKDIR /app
+
+EXPOSE 5000
+
+CMD ["python3", "app.py"]

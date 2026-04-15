@@ -41,6 +41,15 @@ services:
 
     ports:
       - "102:102"
+  gui:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    container_name: honeyd-gui
+    ports:
+      - "5000:5000"
+    working_dir: /opt/honeyd
+    command: python3 app.py
 
     environment:
       HONEYD_INTERFACE: eth0
@@ -52,5 +61,9 @@ services:
     volumes:
       - ./infra/config/honeyd.conf:/opt/honeyd/honeyd.conf:ro
       - ./scripts:/opt/honeyd/scripts:ro
+      - ./gui/app.py:/opt/honeyd/app.py
+      - ./gui/templates:/opt/honeyd/templates
+      - ./gui/static:/opt/honeyd/static
+      - /var/run/docker.sock:/var/run/docker.sock
 
     restart: unless-stopped
