@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HoneyD Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #8C0B42;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+        }
+
+        pre {
+            background: #111;
+            color: #0f0;
+            padding: 10px;
+            height: 250px;
+            overflow-y: scroll;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: none;
+            background: #009DB8;
+            color: white;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #6CC3BC;
+        }
+
+        .challenge {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .challenge h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>HoneyD Monitoring Dashboard</h1>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h2>Live Logs</h2>
+            <pre id="logbox">Loading logs...</pre>
+        </section>
+
+        <section class="panel">
+            <h2>Challenges</h2>
+            <div id="challengeList">Loading challenges...</div>
+        </section>
+
+        <section class="panel">
+            <h2>Tools</h2>
+            <button onclick="downloadPCAP()">Download Latest PCAP</button>
+            <button onclick="runAnalysis()">Run Analysis</button>
+            <pre id="analysisOutput">No analysis run yet.</pre>
+        </section>
+
+        <section class="panel">
+            <h2>Status</h2>
+            <div id="statusBox">Checking status...</div>
+        </section>
+    </main>
+
+    <script>
+        async function loadLogs() {
+            try {
+                const res = await fetch("/api/logs");
+                const data = await res.json();
+                document.getElementById("logbox").textContent = data.logs.join("");
+            } catch (err) {
+                document.getElementById("logbox").textContent = "Error loading logs.";
+            }
+        }
+
+        async function loadChallenges() {
+            try {
+                const res = await fetch("/api/challenges");
+                const challenges = await res.json();
+                const container = document.getElementById("challengeList");
+                container.innerHTML = "";
+
+                challenges.forEach(ch => {
+                    const div = document.createElement("div");
+                    div.className = "challenge";
+                    div.innerHTML = `
+                        <h3>${ch.title}</h3>
+                        <p>${ch.description}</p>
+                        <button onclick="alert('${ch.hint}')">Hint</button>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                document.getElementById("challengeList").textContent = "Error loading challenges.";
+            }
+        }
+
+        async function loadStatus() {
+            try {
+                const res = await fetch("/api/status");
+                const data = await res.json();
+
+                if (data.running) {
+                    document.getElementById("statusBox").textContent = "HoneyD container is running.";
+                } else {
+                    document.getElementById("statusBox").textContent = "HoneyD container is not running.";
+                }
+            } catch (err) {
+                document.getElementById("statusBox").textContent = "Error checking status.";
+            }
+        }
+
+        function downloadPCAP() {
+            window.location.href = "/api/pcap";
+        }
+
+        async function runAnalysis() {
+            const output = document.getElementById("analysisOutput");
+            output.textContent = "Running analysis...";
+
+            try {
+                const res = await fetch("/api/analysis", { method: "POST" });
+                const data = await res.json();
+                output.textContent = data.analysis || JSON.stringify(data, null, 2);
+            } catch (err) {
+                output.textContent = "Error running analysis.";
+            }
+        }
+
+        setInterval(loadLogs, 3000);
+        setInterval(loadStatus, 5000);
+
+        loadLogs();
+        loadChallenges();
+        loadStatus();
+    </script>
+</body>
+</html>

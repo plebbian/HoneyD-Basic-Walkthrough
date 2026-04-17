@@ -27,8 +27,13 @@ RUN apt-get update && apt-get install -y \
     zlib1g \
     zlib1g-dev \
     python \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
-    
+
+# Install Python dependencies for Flask GUI
+RUN pip3 install --upgrade pip==20.3.4 && \
+    pip3 install Flask==1.1.2 docker==4.4.4
 
 WORKDIR /opt
 
