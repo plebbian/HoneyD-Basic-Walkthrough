@@ -49,7 +49,7 @@ curl http://(IP_ADDRESS)
 
 - SSH:
 ```bash
-<pre> ssh user@(IP_ADDRESS)
+ssh user@(IP_ADDRESS)
 ```
 
 - Netcat (generic interaction):
