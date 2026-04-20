@@ -13,7 +13,9 @@ An example of a low-interaction honeypot is ***Honeyd***. Honeyd works by creati
 ### 2. Instructions:
 #### Step 1: Scan for Open Ports
 First, you need to identify which services the honeypot is pretending to run. Use a network scanning tool like ***nmap***:
-<pre> nmap 192.128.0.1 </pre>
+```bash
+nmap 192.128.0.1 
+```
 This will return a list of open ports.
 
 #### Step 2: Analyze the Results
@@ -30,15 +32,21 @@ Now, Connect to the open ports to see how the honeypot behaves.
 
 If port 80 (HTTP) is open:
 - Use curl to send a request:
-<pre> curl http://192.128.0.1 </pre>
+```bash
+curl http://192.128.0.1
+```
 
 If port 22 (SSH) is open:
 - Try connecting using SSH:
-<pre> ssh user@192.128.0.1 </pre>
+```bash
+ssh user@192.128.0.1
+```
 
 If other ports are open:
 - You can use tools like:
-<pre> nc 192.128.0.1 (port_number) </pre>
+```bash
+nc 192.128.0.1 (port_number)
+```
 
 #### Step 4: Observe Results
 Pay attention to:
@@ -57,7 +65,7 @@ Write down:
 ### 3. Solution:
 Example Solutions:
 - Using Curl on Open Port 80:
-<pre> 
+```bash
 nmap 192.128.0.1
 curl http://192.128.0.1
-</pre>
+```
