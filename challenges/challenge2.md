@@ -19,10 +19,14 @@ You are given access to multiple IP addresses. One of them is a honeypot, and th
 
 #### Step 1: Scan Each IP Address
 Use a scanning tool to identify open ports and services:
-<pre> nmap -sV (IP_ADDRESS) </pre>
+```bash
+nmap -sV (IP_ADDRESS)
+```
 Example:
-<pre> nmap -sV 192.128.0.1
-nmap -sV 192.128.0.2 </pre>
+```bash
+nmap -sV 192.128.0.1
+nmap -sV 192.128.0.2 
+```
 
 #### Step 2: Compare Results
 For each IP, analyze:
@@ -39,13 +43,19 @@ Look for inconsistencies such as:
 Try connecting to the services you discovered:
 
 - HTTP:
-<pre> curl http://(IP_ADDRESS) </pre>
+```bash
+curl http://(IP_ADDRESS)
+```
 
-- SSH: 
-<pre> ssh user@(IP_ADDRESS) </pre>
+- SSH:
+```bash
+<pre> ssh user@(IP_ADDRESS)
+```
 
 - Netcat (generic interaction):
-<pre> nc (IP_ADDRESS) (port) </pre>
+```bash
+nc (IP_ADDRESS) (port)
+```
 
 #### Step 4: Identify Suspicious Behavior
 Pay attention to:
