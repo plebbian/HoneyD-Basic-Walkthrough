@@ -24,14 +24,22 @@ You are the owner of a honeypot system. An attacker has been interacting with it
 
 #### Step 1: View the Honeypot Logs
 Use commands to inspect the log files:
-<pre> cat honeypot.log </pre>
+```bash
+cat honeypot.log
+```
 Or for larger files:
-<pre> less honeypot.log </pre>
+```bash
+less honeypot.log
+```
 
 #### Step 2: Filter Relevant Activity
 Search for specific patterns such as repeated IP addresses or ports:
-<pre> grep "192.128.0" honeypot.log </pre>
-<pre> grep "port" honeypot.log </pre>
+```bash
+grep "192.128.0" honeypot.log
+```
+```bash
+grep "port" honeypot.log
+```
 
 #### Step 3: Identify Key Details
 Look for:
