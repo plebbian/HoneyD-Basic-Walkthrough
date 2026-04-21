@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     python \
     python3 \
     python3-pip \
+    openssh-server \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies for Flask GUI
@@ -54,6 +55,16 @@ RUN if [ -f /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 ]; then \
         cp /opt/honeyplc/snap7/build/bin/x86_64-linux/libsnap7.so-300 /usr/lib/libsnap7.so; \
     fi
 
+# -----------------------------
+# SSH honeypot backend setup
+# -----------------------------
+RUN mkdir -p /var/run/sshd && \
+    useradd -m testuser && \
+    echo 'testuser:password123' | chpasswd
+
+# Configure sshd to listen on port 2222
+RUN printf '\nPort 2222\nListenAddress 0.0.0.0\nPasswordAuthentication yes\nPermitRootLogin no\nUsePAM no\n' >> /etc/ssh/sshd_config
+
 WORKDIR /opt/honeyd
 
 COPY infra/docker/entrypoint.sh /opt/honeyd/entrypoint.sh
@@ -62,4 +73,3 @@ COPY infra/config/honeyd.conf /opt/honeyd/honeyd.conf
 RUN chmod +x /opt/honeyd/entrypoint.sh
 
 ENTRYPOINT ["/opt/honeyd/entrypoint.sh"]
-

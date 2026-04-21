@@ -22,6 +22,21 @@ if [ ! -f "${CONFIG}" ]; then
     exit 1
 fi
 
+echo "[*] STARTING SSH BACKEND ON PORT 2222..."
+mkdir -p /var/run/sshd
+/usr/sbin/sshd
+
+echo "[*] STARTING WEB BACKEND ON PORT 8080..."
+cd /opt/honeyd
+nohup python3 -m http.server 8080 >/tmp/web.log 2>&1 &
+sleep 2
+
+if ! ss -tulpn | grep -q ':8080'; then
+    echo "[!] WEB BACKEND FAILED TO START"
+    cat /tmp/web.log 2>/dev/null || true
+    exit 1
+fi
+
 echo "[*] ADDING ROUTE: ${HONEYD_NET} via ${HONEYD_GW}"
 ip route add "${HONEYD_NET}" via "${HONEYD_GW}" 2>/dev/null || true
 
