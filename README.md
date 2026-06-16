@@ -1,6 +1,6 @@
 # HoneyD-Basic-Walkthrough
----
--add overview later-
+This repo is a quick, fun way to get familiar with how to interact with a fake network as a hacker using reconnaissance commands while also playing the part as an observer of the honeypot network.
+
 ---
 
 # Setup and Containerization
